@@ -64,6 +64,84 @@ struct DArr {
         return lastElement;
     }
 
+    void operator=(const DArr& rhs) {
+        // Make current structure a deep copy of rhs
+
+        // Allocate new memory for current structure
+        T* copyArr = new T[rhs.cap];
+
+        // Clear current structure
+        delete[] arr;
+
+        // Copy into new allocated memory
+        for (int i=0; i < rhs.size; i++) { arr[i] = rhs.arr[i] }
+
+        // point current structure to newly copied 
+        arr = copyArr;
+        arr.size = rhs.size;
+        arr.cap = rhs.cap;
+    } 
+
+
+    T& operator[](const int& index) {
+        if (index < 0 || index >= size) {
+            return NULL;
+        }
+        return arr[index];
+    } 
+
+    void resize(const int n) {
+        if (n < 0 || n >= cap) {
+            return NULL;
+        }
+        else if (n < size) {
+            size = n;
+        }
+        else if (n > size) {
+            int i = size;
+            size = n;
+            for (i; i < size; i++) {
+                arr[i] = T();
+            }
+        }
+    }
+
+    void insert(const int value, const int index) {
+        if (index < 0 || index >= size) {
+            return NULL;
+        }
+        // Check if size == cap 
+        // To resize first
+        if (size == cap) {
+            int newCap = cap * 2;
+            reserve(newCap);
+        }
+        
+        size++;
+        int curr = index;
+        int swap = 0;
+        int prev = arr[curr];
+        arr[curr] = value;
+        while (++curr != size) {
+            swap = arr[curr]; 
+            arr[curr] = prev;
+            prev = swap;
+        }
+        // Doesnt work for when inserting at end
+    }
+
+    void erase(const int index) {
+        if (index < 0 || index >= size) {
+            return NULL;
+        }
+        int curr = index;
+        while (++curr != size) {
+            arr[curr-1] = arr[curr]
+        }
+        size--;
+        // Leaves last element undeleted, but it will be overwritten if pushing back.
+    }
+
 
     void reserve(const int n) {
         // Initialize larger array size with cap = n
@@ -81,6 +159,4 @@ struct DArr {
         arr = newArr;
         cap = n;
     }
-
 };
-
