@@ -1,0 +1,68 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Test Debug",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${fileDirname}/test",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Build Test",
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
+        {
+            "name": "Kattis Debug",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${fileDirname}/main",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Build Kattis",
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
+        {
+            "name": "Valgrind Test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${fileDirname}/test",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Valgrind Test",
+            "miDebuggerPath": "/usr/bin/gdb"
+        }
+    ]
+}

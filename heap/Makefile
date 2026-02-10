@@ -1,7 +1,7 @@
 MAIN = main
 TEST = test
-FILES = main.cpp dynamic_array.cpp
-TEST_FILES = test_dynamic_array.cpp dynamic_array.cpp
+FILES = main.cpp heap.cpp
+TEST_FILES = test_heap.cpp heap.cpp
 
 CXXFLAGS = -std=c++98 -Wall -Wextra -O0 -g -fno-omit-frame-pointer
 VALGRIND = valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes
@@ -37,9 +37,3 @@ clean:
 	rm -f $(MAIN) $(TEST)
 
 .PHONY: all release debug test run run-test valgrind-main valgrind-test clean
-
-clean:
-	rm -f $(TARGET)
-
-run: $(TARGET)
-	./$(TARGET)

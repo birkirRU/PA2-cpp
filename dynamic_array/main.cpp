@@ -1,6 +1,6 @@
 #include <cassert>
 #include <iostream>
-#include "vector.h"
+#include "dynamic_array.h"
 
 using std::cout;
 using std::cin;
@@ -30,7 +30,8 @@ int main() {
         else if (op == '+') {
             int value;
             cin >> value;
-            // push back
+            DArr<int>& arr = vecs[instance];
+            arr.push_back(value);
         }
         else if (op == '-') {
             // pop back
@@ -61,7 +62,8 @@ int main() {
             // resize
         }
         else if (op == 'p') {
-            // print
+            DArr<int> arr = vecs[instance];
+            arr.print();
         }
         else {
             assert(false);
