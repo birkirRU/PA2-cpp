@@ -1,7 +1,7 @@
 MAIN = main
 TEST = test
-FILES = main.cpp stack.cpp
-TEST_FILES = test_stack.cpp stack.cpp
+FILES = main.cpp stack.cpp ../dynamic_array/dynamic_array.cpp
+TEST_FILES = test_stack.cpp stack.cpp ../dynamic_array/dynamic_array.cpp
 
 CXXFLAGS = -std=c++98 -Wall -Wextra -O0 -g -fno-omit-frame-pointer
 VALGRIND = valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes

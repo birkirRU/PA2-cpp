@@ -1,3 +1,5 @@
+#ifndef DYNAMIC_ARRAY_H
+#define DYNAMIC_ARRAY_H // to gaurd against circular dependancies
 
 #include <iostream>
 #include <cassert>
@@ -28,3 +30,5 @@ struct DArr {
     DArr& operator=(const DArr& rhs); // Declaration
     T& operator[](const int index);
 };
+
+#endif

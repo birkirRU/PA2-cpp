@@ -82,7 +82,6 @@ DArr<T>& DArr<T>::operator=(const DArr& rhs) {
 }
 
 
-
 template<typename T>
 T& DArr<T>::operator[](const int index) {
     // if (index < 0 || index >= size) {

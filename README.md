@@ -22,6 +22,8 @@ Brief description of the data structure, its purpose, and key implementation det
 | **[Operation 3]** | O(?) | Edge cases and behavior |
 | **[...]** | O(?) | ... |
 
+CAN ALSO DO THIS ABOVE FUNCTION DECLARATION IN .h FILES
+
 ### **Memory Management**
 How the structure allocates, manages, and frees memory.
 
