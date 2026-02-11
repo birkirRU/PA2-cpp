@@ -16,7 +16,7 @@ struct DArr {
     
     // Methods 
     void push_back(const T& value);  
-    T pop_back();
+    void pop_back();
     void reserve(const int n);
     void resize(const int n); 
     void insert(const T& value, const int index);

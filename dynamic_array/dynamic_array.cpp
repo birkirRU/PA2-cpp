@@ -48,19 +48,18 @@ void DArr<T>::push_back(const T& data) {
 }
 
 template<typename T>
-T DArr<T>::pop_back() {
+void DArr<T>::pop_back() {
     // if (size == 0) {
     //     return NULL;
     // }
     assert(size != 0);
 
-    T lastElement = arr[size - 1];
-    arr[--size] = T(); // Sets default value of T, e.x. 0 for int.
+    arr[size-1] = T(); // Sets default value of T, e.x. 0 for int.
+    size--;
 
-    if (size <= cap/4) {
+    if (size <= cap/4 && cap > 8) {
         reserve(cap/4);
     }
-    return lastElement;
 }
 
 template<typename T>
@@ -101,14 +100,18 @@ void DArr<T>::resize(const int n) {
     //     return;
     // }
     
-    assert( n >= 0 && n < cap);
+    assert( n >= 0 );
+    if (n >= cap) {
+        reserve(n);
+    }
+
     if (n < size) {
         size = n;
     }
     else if (n > size) {
-        int i = size;
+        int oldSize = size;
         size = n;
-        for (; i < size; i++) {
+        for (int i = oldSize; i < size; i++) {
             arr[i] = T();
         }
     }
@@ -120,7 +123,13 @@ void DArr<T>::insert(const T& value, const int index) {
     //     return;
     // }
 
-    assert( index >= 0 && index < size);
+    if (size != 0) {
+        assert( index >= 0 && index <= size );
+    }
+    else {
+        assert( index == 0 );
+    }
+
     // Check if size == cap 
     // To resize first
     if (size == cap) {
@@ -128,17 +137,11 @@ void DArr<T>::insert(const T& value, const int index) {
         reserve(newCap);
     }
     
-    size++;
-    int curr = index;
-    T swap = T();
-    T prev = arr[curr];
-    arr[curr] = value;
-    while (++curr != size) {
-        swap = arr[curr]; 
-        arr[curr] = prev;
-        prev = swap;
+    for (int i = size; i > index; --i) {
+        arr[i] = arr[i-1];
     }
-    // Doesnt work for when inserting at end
+    arr[index] = value;
+    size++;
 }
 
 template<typename T>

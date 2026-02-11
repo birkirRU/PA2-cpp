@@ -25,6 +25,9 @@ int main() {
             int other;
             cin >> other;
             other--; // change to 0-based index
+            DArr<int>& arr = vecs[instance];
+            DArr<int>& arrOther = vecs[other];
+            arr = arrOther;
             // assignment
         }
         else if (op == '+') {
@@ -32,34 +35,49 @@ int main() {
             cin >> value;
             DArr<int>& arr = vecs[instance];
             arr.push_back(value);
+            // push back
         }
         else if (op == '-') {
+            
+            DArr<int>& arr = vecs[instance];
+            arr.pop_back();
             // pop back
         }
         else if (op == 'i') {
             int index, value;
             cin >> index >> value;
+            DArr<int>& arr = vecs[instance];
+            arr.insert(value, index);
             // insert
         }
         else if (op == 'e') {
             int index;
             cin >> index;
+            DArr<int>& arr = vecs[instance];
+            arr.erase(index);
             // erase
         }
         else if (op == 'g') {
             int index;
             cin >> index;
+            DArr<int>& arr = vecs[instance];
+            int element = arr[index];
+            std::cout << element << '\n';
             // get
         }
         else if (op == 's') {
             int index, value;
             cin >> index >> value;
+            DArr<int>& arr = vecs[instance];
+            arr[index] = value;
             // set
         }
         else if (op == 'r') {
             int sz;
             cin >> sz;
-            // resize
+            DArr<int>& arr = vecs[instance];
+            arr.resize(sz);
+
         }
         else if (op == 'p') {
             DArr<int> arr = vecs[instance];
