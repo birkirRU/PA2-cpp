@@ -125,7 +125,6 @@ struct HashTable {
             table[i] = NULL;
         };
 
-        int old_size = size;
         size = 0;
         int old_capacity = capacity;
         capacity = capacity * 2;

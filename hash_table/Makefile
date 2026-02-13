@@ -1,39 +1,36 @@
 MAIN = main
-TEST = test
 FILES = main.cpp hash_table.cpp
-TEST_FILES = test_hash_table.cpp hash_table.cpp
 
 CXXFLAGS = -std=c++98 -Wall -Wextra -O0 -g -fno-omit-frame-pointer
+
 VALGRIND = valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes
 
-all: $(MAIN) $(TEST)
+all: $(MAIN)
 
 $(MAIN): $(FILES)
 	g++ $(CXXFLAGS) $(FILES) -o $(MAIN)
 
-$(TEST): $(TEST_FILES)
-	g++ $(CXXFLAGS) $(TEST_FILES) -o $(TEST)
-
-release: clean
-	g++ -std=c++98 -O2 -o $(MAIN) $(FILES)
-
-debug: $(MAIN)
-
-test: $(TEST)
-
 run: $(MAIN)
 	./$(MAIN)
-
-run-test: $(TEST)
-	./$(TEST)
 
 valgrind-main: $(MAIN)
 	$(VALGRIND) ./$(MAIN)
 
-valgrind-test: $(TEST)
-	$(VALGRIND) ./$(TEST)
+test: $(MAIN)
+	@echo "Running tests..."
+	@for f in Tests/test*.in; do \
+		n=$$(basename "$$f" .in); \
+		./$(MAIN) < "$$f" > /tmp/$$n.got; \
+		if diff -q "Tests/$$n.out" /tmp/$$n.got > /dev/null; then \
+			echo "$$n PASS"; \
+		else \
+			echo "$$n FAIL"; \
+			diff -u "Tests/$$n.out" /tmp/$$n.got; \
+		fi; \
+	done
 
 clean:
-	rm -f $(MAIN) $(TEST)
+	rm -f $(MAIN)
+	rm -rf *.dSYM
 
-.PHONY: all release debug test run run-test valgrind-main valgrind-test clean
+.PHONY: all run valgrind-main test clean
