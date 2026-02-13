@@ -966,3 +966,709 @@ This means a tree with 1,000,000 nodes has height at most 29, ensuring fast oper
 **Kth(k):**
 - Recursively search using subtree sizes: O(log n)
 - Total: O(log n)
+
+
+# Hash Table Implementation
+
+## **Hash Table (Separate Chaining)**
+
+### **Overview**
+A hash table implementation using separate chaining for collision resolution. The hash table maps integer keys to integer values and provides average-case O(1) insertion, deletion, and lookup operations. The implementation automatically resizes when the load factor exceeds 0.7 to maintain performance.
+
+**Implementation Notes**:
+- **Collision resolution**: Separate chaining with singly-linked lists
+- **Hash function**: `hash(key) = abs(key * 539) % capacity`
+- **Initial capacity**: 16 buckets (configurable via constructor)
+- **Load factor threshold**: 0.7 (70%)
+- **Resize factor**: 2x capacity when load factor exceeded
+- **Duplicate key handling**: Insert ignores duplicates; use set operation (erase + insert) to update values
+- **Dynamic resizing**: Automatic doubling of capacity with full rehashing
+
+### **Time Complexities & Edge Cases**
+
+| Operation | Average Case | Worst Case | Exceptional Cases / Behavior |
+|-----------|-------------|------------|------------------------------|
+| **Constructor** | O(c) | O(c) | Initializes hash table with capacity c (default 16); Allocates bucket array |
+| **Destructor** | O(n) | O(n) | Traverses all chains to delete nodes; Deallocates bucket array |
+| **Copy Constructor** | O(n) | O(n) | Deep copy via insert; Creates independent copy with same capacity |
+| **Assignment Operator** | O(n + m) | O(n + m) | Destroys current table (m elements), deep copies rhs (n elements); Handles self-assignment |
+| **insert(key, value)** | O(1) amortized | O(n) | Ignores duplicate keys (no update); May trigger resize; Worst case when all keys hash to same bucket |
+| **erase(key)** | O(1) amortized | O(n) | Removes key-value pair; Does nothing if key not found; Decrements size |
+| **access(key, ret_val)** | O(1) amortized | O(n) | Returns true and sets ret_val if key found; Returns false and sets ret_val to 0 if not found |
+| **get_size()** | O(1) | O(1) | Returns number of key-value pairs in table |
+| **resize()** | O(n) | O(n) | Doubles capacity; Rehashes all n elements; Called automatically when load factor > 0.7 |
+
+### **Memory Management**
+
+**Allocation Strategy**:
+- **Bucket array**: Array of `capacity` pointers to linked list heads
+- **Nodes**: Dynamically allocated for each key-value pair
+- **Memory per node**: 2 integers (key, value) + 1 pointer (next)
+- **Load factor control**: Maintains load factor ≤ 0.7 via automatic resizing
+
+**Hash Function**:
+- **Formula**: `hash(key) = abs(key * 539) % capacity`
+- **Multiplier**: 539 (a prime-like constant for distribution)
+- **Modulo**: Ensures index within [0, capacity-1]
+- **Absolute value**: Handles negative keys
+
+**Collision Resolution**:
+- **Method**: Separate chaining with singly-linked lists
+- **Chain structure**: Each bucket points to head of linked list
+- **Insertion order**: New elements added to end of chain (to check for duplicates)
+- **Chain traversal**: Linear search within chain for key lookup/deletion
+
+**Resizing Strategy**:
+- **Trigger**: Load factor = (size + 1) / capacity > 0.7
+- **New capacity**: 2 × old capacity
+- **Rehashing**: All elements rehashed into new table (hash values change with new capacity)
+- **Memory efficiency**: Temporary doubling during resize (old + new tables)
+
+**Copy Semantics**:
+- **Copy Constructor**: Deep copy via insert; Preserves capacity and all key-value pairs
+- **Assignment Operator**: Destroys existing table, deep copies from source; Handles self-assignment
+
+**Key Features**:
+- Average O(1) operations for insert, delete, and lookup
+- Automatic resizing maintains performance
+- Separate chaining handles collisions gracefully
+- No update on duplicate insert (intentional design choice)
+- Set operation (erase + insert) available for value updates
+
+### **Node Structure**
+
+Each node in the chaining linked lists contains:
+- **key**: Integer search key (unique within table)
+- **value**: Associated integer value
+- **next**: Pointer to next node in chain (NULL if last)
+
+### **Hash Table Structure**
+
+The hash table maintains:
+- **table**: Array of Node* pointers (bucket heads)
+- **size**: Number of key-value pairs currently in table
+- **capacity**: Number of buckets in the array
+
+## **Testing**
+
+### **Compilation and Execution**
+
+**To compile the main program:**
+```bash
+make
+# or
+make main
+```
+
+**To compile the test suite:**
+```bash
+make test
+```
+
+**To run the main program (interactive mode):**
+```bash
+make run
+# or
+./main
+```
+
+**To run the automated test suite:**
+```bash
+make run-test
+# or
+./test
+```
+
+**To run with memory leak detection:**
+```bash
+make valgrind-main    # Check main program
+make valgrind-test    # Check test suite
+```
+
+**To clean build artifacts:**
+```bash
+make clean
+```
+
+### **Test Suite Structure**
+
+The test suite consists of 10 test files with corresponding expected output files in the `tests/` directory:
+
+- **tests/test1.txt / tests/eout1.txt**: Basic insert and access operations
+- **tests/test2.txt / tests/eout2.txt**: Erase operations and size tracking
+- **tests/test3.txt / tests/eout3.txt**: Duplicate key insertion (no update)
+- **tests/test4.txt / tests/eout4.txt**: Set operation (update via erase + insert)
+- **tests/test5.txt / tests/eout5.txt**: Access on non-existent keys
+- **tests/test6.txt / tests/eout6.txt**: Assignment operator and independence
+- **tests/test7.txt / tests/eout7.txt**: Automatic resizing behavior
+- **tests/test8.txt / tests/eout8.txt**: Multiple instances with assignment
+- **tests/test9.txt / tests/eout9.txt**: Complex mixed operations
+- **tests/test10.txt / tests/eout10.txt**: Large-scale stress test with collisions
+
+### **Test Input Format**
+
+Each test file follows this format:
+```
+<number_of_operations>
+<instance_number> <operation> [arguments...]
+```
+
+**Operations:**
+- `i` key value: insert(key, value) - Insert key-value pair; Ignores if key exists
+- `e` key: erase(key) - Remove key-value pair; Does nothing if key doesn't exist
+- `g` key: access(key, value) - Get value for key; Prints value if found, "-" if not found
+- `s` key value: Set operation - Erase key then insert key-value (updates value)
+- `z`: get_size() or access size member - Get number of elements; Prints to output
+- `a` other_instance: Assignment from other_instance - Deep copy from another hash table instance
+
+### **Test Execution**
+
+The test runner automatically:
+1. Runs each test file (tests/test1.txt through tests/test10.txt)
+2. Compares actual output with expected output (tests/eout1.txt through tests/eout10.txt)
+3. Reports pass/fail status with color coding
+4. Provides a summary of test results
+
+**Expected Output:**
+```
+========================================
+  Hash Table Test Suite
+========================================
+
+[PASS] Test 1
+[PASS] Test 2
+[PASS] Test 3
+[PASS] Test 4
+[PASS] Test 5
+[PASS] Test 6
+[PASS] Test 7
+[PASS] Test 8
+[PASS] Test 9
+[PASS] Test 10
+
+========================================
+  Test Summary
+========================================
+  Total:   10
+  Passed:  10
+  Failed:  0
+========================================
+
+All tests passed!
+```
+
+## **Implementation Files**
+
+- **hash_table.h**: Header file with Node struct and HashTable class
+- **hash_table.cpp**: Implementation file (currently empty - all inline in header)
+- **main.cpp**: Interactive program for manual testing with multiple table instances
+- **test_hash_table.cpp**: Automated test suite runner
+- **Makefile**: Build automation with multiple targets
+- **tests/test1.txt - tests/test10.txt**: Test input files
+- **tests/eout1.txt - tests/eout10.txt**: Expected output files
+
+## **Design Decisions**
+
+1. **Separate Chaining**: Chosen for simplicity and because it handles high load factors gracefully without clustering issues.
+
+2. **No Update on Insert**: Duplicate key insertion is ignored rather than updating the value. This is intentional - use the set operation (erase + insert) to update values.
+
+3. **Load Factor 0.7**: Chosen to balance memory usage and performance. At 70% capacity, resize is triggered to maintain O(1) average-case performance.
+
+4. **2x Resize Factor**: Doubling the capacity provides amortized O(1) insertion while avoiding excessive resizing operations.
+
+5. **Hash Function**: `hash(key) = abs(key * 539) % capacity` - The multiplier 539 is chosen for good distribution properties. Absolute value handles negative keys.
+
+6. **End-of-Chain Insertion**: New elements are added to the end of chains (after checking for duplicates) rather than the front. This requires traversing the chain but ensures duplicate detection.
+
+7. **Destructor Helper**: Separate `desctructor()` method allows reuse in assignment operator for cleanup before copying.
+
+8. **Size Member**: Direct access to `size` member in main.cpp (via `table[instance].size`) provides O(1) size queries without function call overhead.
+
+## **Hash Table Operations**
+
+### **Load Factor and Resizing**
+
+The hash table maintains performance by controlling the load factor:
+
+```
+Load Factor = (size + 1) / capacity
+
+If Load Factor > 0.7:
+    Resize to 2 × capacity
+    Rehash all elements
+```
+
+**Example**:
+```
+Initial capacity: 16
+Insert 11 elements -> size = 11, load factor = 12/16 = 0.75 > 0.7
+Resize triggered -> new capacity = 32
+All 11 elements rehashed into new 32-bucket table
+```
+
+### **Collision Handling**
+
+When multiple keys hash to the same bucket:
+
+```
+Bucket 5: key=10 -> key=49 -> key=88 -> NULL
+
+insert(127, value):
+    hash(127) = 5
+    Traverse chain: 10 -> 49 -> 88
+    Check each for key=127 (not found)
+    Add new node at end: 10 -> 49 -> 88 -> 127
+```
+
+### **Insert vs Set**
+
+```
+Table: { 10:100, 20:200, 30:300 }
+
+insert(20, 999):
+    Key 20 exists -> ignored
+    Table: { 10:100, 20:200, 30:300 }  // No change
+
+set(20, 999):
+    erase(20) -> Table: { 10:100, 30:300 }
+    insert(20, 999) -> Table: { 10:100, 20:999, 30:300 }  // Updated
+```
+
+### **Typical Use Cases**
+
+- Key-value storage with fast lookup (dictionaries, caches)
+- Counting occurrences (frequency maps)
+- Detecting duplicates in data sets
+- Implementing sets (store keys, ignore values)
+- Symbol tables in compilers/interpreters
+- Database indexing for non-sequential keys
+- Memoization for dynamic programming
+
+### **Hash Table Invariants**
+
+- **Uniqueness**: Each key appears at most once in the table
+- **Bucket Invariant**: key K is in bucket `hash(K) % capacity`
+- **Size Invariant**: `size` equals total number of nodes across all chains
+- **Chain Structure**: Each chain is a NULL-terminated singly-linked list
+- **Load Factor Control**: `size / capacity ≤ 0.7` after any operation (may temporarily exceed during insert before resize)
+
+## **Complexity Analysis**
+
+### **Average Case Analysis**
+
+With good hash distribution and load factor ≤ 0.7:
+
+**Expected chain length** = load factor ≈ 0.7
+
+Therefore:
+- **Insert**: Hash computation O(1) + chain traversal O(0.7) ≈ O(1)
+- **Lookup**: Hash computation O(1) + chain traversal O(0.7) ≈ O(1)
+- **Delete**: Hash computation O(1) + chain traversal O(0.7) ≈ O(1)
+
+### **Worst Case Analysis**
+
+When all keys hash to the same bucket:
+
+**Chain length** = n (all elements in one chain)
+
+Therefore:
+- **Insert**: O(n) to traverse chain and check for duplicates
+- **Lookup**: O(n) to traverse chain
+- **Delete**: O(n) to find and remove element
+
+### **Amortized Analysis of Resizing**
+
+**Resize cost**: O(n) to rehash all elements
+
+**Resize frequency**: After every n/2 insertions (when load factor hits 0.7)
+
+**Amortized cost per insert**:
+```
+Total cost for n insertions:
+= n × O(1) for normal inserts
++ O(log n) resizes × O(n) per resize
+= O(n) + O(n log n) / O(n)
+= O(1) amortized per insert
+```
+
+### **Space Complexity**
+
+- **Table array**: O(capacity) = O(n) when n elements stored
+- **Nodes**: O(n) for n key-value pairs
+- **Total**: O(n)
+- **Overhead**: Bucket array may have empty slots; worst case 43% waste at load factor 0.7
+
+
+
+# Doubly Linked List Implementation
+
+## **Doubly Linked List (Circular with Sentinel)**
+
+### **Overview**
+A doubly linked list implementation using a circular structure with a sentinel node. Each node has pointers to both its predecessor and successor, enabling efficient bidirectional traversal. The sentinel node acts as a dummy node that simplifies edge cases by eliminating the need for NULL checks at the list boundaries.
+
+**Implementation Notes**:
+- **Sentinel node**: Dummy node that marks both the beginning and end of the list
+- **Circular structure**: Last node's next points to sentinel; sentinel's prev points to last node
+- **Bidirectional links**: Each node has both `prev` and `next` pointers
+- **Iterator-like cursors**: Operations use node pointers as cursors for flexible positioning
+- **Insert before cursor**: `insert(cursor, value)` inserts new node before the cursor position
+- **No bounds checking**: Caller responsible for not erasing sentinel or dereferencing it
+
+### **Time Complexities & Edge Cases**
+
+| Operation | Time Complexity | Exceptional Cases / Behavior |
+|-----------|----------------|------------------------------|
+| **Constructor** | O(1) | Creates empty list with sentinel; Sentinel points to itself |
+| **Destructor** | O(n) | Deletes all nodes except sentinel, then deletes sentinel |
+| **Copy Constructor** | O(n) | Deep copy via copyFrom; Creates independent copy |
+| **Assignment Operator** | O(n + m) | Clears current list (m elements), copies from rhs (n elements); Handles self-assignment |
+| **insert(cursor, value)** | O(1) | Inserts new node before cursor; Returns pointer to new node; Works even if cursor is sentinel |
+| **erase(cursor)** | O(1) | Removes node at cursor; Returns pointer to next node (successor); Caller must not erase sentinel |
+| **successor(cursor)** | O(1) | Returns next node; Returns sentinel if cursor is last element |
+| **predecessor(cursor)** | O(1) | Returns previous node; Returns sentinel if cursor is first element |
+| **begin_node()** | O(1) | Returns first node in list (sentinel->next); Returns sentinel if list empty |
+| **sentinel_end_node()** | O(1) | Returns sentinel node (marks end position) |
+| **size()** | O(1) | Returns number of elements in list (excludes sentinel) |
+
+### **Memory Management**
+
+**Allocation Strategy**:
+- **Sentinel node**: Single node allocated at construction, persists for lifetime of list
+- **Data nodes**: Each element stored in dynamically allocated node
+- **Memory per node**: 1 integer (data) + 2 pointers (prev, next)
+- **No capacity/growth factor**: List grows one node at a time as needed
+
+**Circular Structure**:
+```
+Empty list:
+    sentinel <-> sentinel (points to itself)
+
+List [10, 20, 30]:
+    sentinel <-> [10] <-> [20] <-> [30] <-> sentinel
+    ^_______________________________________________|
+```
+
+**Sentinel Benefits**:
+- **No NULL checks**: All nodes always have valid prev/next pointers
+- **Unified operations**: Insert/erase work identically at any position
+- **Simple empty list**: Empty list has sentinel pointing to itself
+- **Iterator end marker**: Sentinel serves as past-the-end iterator position
+
+**Copy Semantics**:
+- **Copy Constructor**: Deep copy creates new sentinel and all nodes; O(n) time
+- **Assignment Operator**: Clears existing list, then deep copies from source
+- **Independence**: Copied lists are completely independent (no shared nodes)
+
+**Key Features**:
+- O(1) insertion and deletion at any position (given cursor)
+- O(1) bidirectional traversal (successor/predecessor)
+- O(1) access to front via begin_node()
+- Circular structure eliminates special cases for head/tail
+- Sentinel node simplifies boundary conditions
+
+### **Node Structure**
+
+Each node contains:
+- **data**: Integer value stored in the node
+- **prev**: Pointer to previous node in the list
+- **next**: Pointer to next node in the list
+
+**Sentinel Node**:
+- Special node that doesn't store meaningful data
+- Acts as both the position before the first element and after the last element
+- Always present, even in empty list
+- Never erased or accessed for data
+
+### **List Structure**
+
+The DLL class maintains:
+- **sentinel**: Pointer to the sentinel node
+- **nodeCount**: Number of data nodes (excludes sentinel)
+
+## **Testing**
+
+### **Compilation and Execution**
+
+**To compile the main program:**
+```bash
+make
+# or
+make main
+```
+
+**To compile the test suite:**
+```bash
+make test
+```
+
+**To run the main program (interactive mode):**
+```bash
+make run
+# or
+./main
+```
+
+**To run the automated test suite:**
+```bash
+make run-test
+# or
+./test
+```
+
+**To run with memory leak detection:**
+```bash
+make valgrind-main    # Check main program
+make valgrind-test    # Check test suite
+```
+
+**To clean build artifacts:**
+```bash
+make clean
+```
+
+### **Test Suite Structure**
+
+The test suite consists of 10 test files with corresponding expected output files in the `tests/` directory:
+
+- **tests/test1.txt / tests/eout1.txt**: Basic insert and get operations
+- **tests/test2.txt / tests/eout2.txt**: Front/back navigation and traversal
+- **tests/test3.txt / tests/eout3.txt**: Erase operations and cursor movement
+- **tests/test4.txt / tests/eout4.txt**: Successor and predecessor traversal
+- **tests/test5.txt / tests/eout5.txt**: Set value and bidirectional iteration
+- **tests/test6.txt / tests/eout6.txt**: Assignment operator and independence
+- **tests/test7.txt / tests/eout7.txt**: Insert at various positions
+- **tests/test8.txt / tests/eout8.txt**: Multiple instances with independent cursors
+- **tests/test9.txt / tests/eout9.txt**: Complex mixed operations
+- **tests/test10.txt / tests/eout10.txt**: Building and traversing larger lists
+
+### **Test Input Format**
+
+Each test file follows this format:
+```
+<number_of_operations>
+<instance_number> <operation> [arguments...]
+```
+
+**Operations:**
+- `i` value: insert(cursor, value) - Insert value before cursor; Sets cursor to new node
+- `e`: erase(cursor) - Erase node at cursor; Sets cursor to successor (next node)
+- `f`: begin_node() - Move cursor to first element (sentinel->next)
+- `b`: sentinel_end_node() - Move cursor to sentinel (end position)
+- `>`: successor(cursor) - Move cursor to next node
+- `<`: predecessor(cursor) - Move cursor to previous node
+- `g`: Get data at cursor - Prints cursor->data to output
+- `s` value: Set data at cursor - Sets cursor->data = value
+- `z`: size() - Get number of elements; Prints to output
+- `a` other_instance: Assignment from other_instance - Deep copy from another list instance
+
+### **Test Execution**
+
+The test runner automatically:
+1. Runs each test file (tests/test1.txt through tests/test10.txt)
+2. Compares actual output with expected output (tests/eout1.txt through tests/eout10.txt)
+3. Reports pass/fail status with color coding
+4. Provides a summary of test results
+
+**Expected Output:**
+```
+========================================
+  Doubly Linked List Test Suite
+========================================
+
+[PASS] Test 1
+[PASS] Test 2
+[PASS] Test 3
+[PASS] Test 4
+[PASS] Test 5
+[PASS] Test 6
+[PASS] Test 7
+[PASS] Test 8
+[PASS] Test 9
+[PASS] Test 10
+
+========================================
+  Test Summary
+========================================
+  Total:   10
+  Passed:  10
+  Failed:  0
+========================================
+
+All tests passed!
+```
+
+## **Implementation Files**
+
+- **doubly_linked_list.h**: Header file with Node struct and DLL class declaration
+- **doubly_linked_list.cpp**: Implementation file with all member functions
+- **main.cpp**: Interactive program for manual testing with multiple list instances
+- **test_doubly_linked_list.cpp**: Automated test suite runner
+- **Makefile**: Build automation with multiple targets
+- **tests/test1.txt - tests/test10.txt**: Test input files
+- **tests/eout1.txt - tests/eout10.txt**: Expected output files
+
+## **Design Decisions**
+
+1. **Sentinel Node**: Using a sentinel eliminates special cases for empty lists and boundary conditions. All operations work uniformly regardless of position.
+
+2. **Circular Structure**: The last node's next points to sentinel, and sentinel's prev points to the last node. This creates a truly circular structure with no NULL pointers.
+
+3. **Insert Before Cursor**: The `insert(cursor, value)` operation inserts the new node immediately before the cursor position. This allows insertion at the beginning (before begin_node()) and at the end (before sentinel).
+
+4. **Erase Returns Successor**: After erasing a node, the cursor automatically moves to the next node (successor). This enables easy iteration with erase: `while (cursor != sentinel) { cursor = erase(cursor); }`
+
+5. **Cursor Initialization**: All cursors are initialized to sentinel on list creation, representing an empty/end position.
+
+6. **No Size Overhead in Operations**: Size is maintained as a member variable and updated during insert/erase, providing O(1) size queries without traversal.
+
+7. **Separate Clear Method**: Private `clear()` method allows code reuse in destructor and assignment operator.
+
+8. **CopyFrom Helper**: Private `copyFrom()` method handles deep copying for both copy constructor and assignment operator.
+
+## **Doubly Linked List Operations**
+
+### **Sentinel and Circular Structure**
+
+The sentinel acts as a boundary marker:
+
+```
+Empty list:
+    sentinel.next = sentinel
+    sentinel.prev = sentinel
+    
+List [10]:
+    sentinel <-> [10] <-> sentinel
+    
+List [10, 20, 30]:
+    sentinel <-> [10] <-> [20] <-> [30] <-> sentinel
+```
+
+### **Insert Operation**
+
+Inserting before a cursor position:
+
+```
+List: [10, 20, 30], cursor points to [20]
+
+insert(cursor, 15):
+    1. Create new node [15]
+    2. [10].next = [15], [15].prev = [10]
+    3. [15].next = [20], [20].prev = [15]
+    Result: [10, 15, 20, 30]
+```
+
+**Special cases**:
+- `insert(begin_node(), value)` - Insert at front
+- `insert(sentinel, value)` - Insert at back (before sentinel = after last element)
+
+### **Erase Operation**
+
+Removing a node and returning successor:
+
+```
+List: [10, 20, 30], cursor points to [20]
+
+erase(cursor):
+    1. [10].next = [30]
+    2. [30].prev = [10]
+    3. delete [20]
+    4. return [30]
+    Result: [10, 30], cursor now at [30]
+```
+
+### **Traversal Examples**
+
+**Forward traversal**:
+```cpp
+Node* cursor = list.begin_node();
+while (cursor != list.sentinel_end_node()) {
+    // Process cursor->data
+    cursor = list.successor(cursor);
+}
+```
+
+**Backward traversal**:
+```cpp
+Node* cursor = list.predecessor(list.sentinel_end_node()); // Last element
+while (cursor != list.sentinel_end_node()) {
+    // Process cursor->data
+    cursor = list.predecessor(cursor);
+}
+```
+
+### **Typical Use Cases**
+
+- Implementing deques (double-ended queues)
+- Browser history (forward/back navigation)
+- Undo/redo functionality with bidirectional traversal
+- Music playlists with previous/next navigation
+- Text editors with cursor movement
+- LRU cache implementation
+- Any scenario requiring efficient insertion/deletion at arbitrary positions
+
+### **List Invariants**
+
+- **Sentinel invariant**: sentinel->next points to first element (or itself if empty); sentinel->prev points to last element (or itself if empty)
+- **Circularity**: For any node N: N->next->prev == N and N->prev->next == N
+- **Size invariant**: nodeCount equals the number of nodes reachable from sentinel (excluding sentinel itself)
+- **Non-NULL invariant**: All prev and next pointers are non-NULL (point to sentinel if at boundary)
+- **Sentinel exclusion**: Sentinel is never counted in size and should never be erased
+
+## **Complexity Analysis**
+
+### **Operation Breakdown**
+
+**insert(cursor, value)**:
+- Allocate new node: O(1)
+- Update 4 pointers: O(1)
+- Increment size: O(1)
+- Total: O(1)
+
+**erase(cursor)**:
+- Update 2 pointers: O(1)
+- Delete node: O(1)
+- Decrement size: O(1)
+- Total: O(1)
+
+**Traversal operations (successor/predecessor)**:
+- Follow pointer: O(1)
+- Total: O(1)
+
+**size()**:
+- Return member variable: O(1)
+- Total: O(1)
+
+### **Comparison with Other Structures**
+
+| Operation | Doubly Linked List | Dynamic Array | Singly Linked List |
+|-----------|-------------------|---------------|-------------------|
+| Insert at cursor | O(1) | O(n) | O(1) |
+| Erase at cursor | O(1) | O(n) | O(1) forward only |
+| Access by index | O(n) | O(1) | O(n) |
+| Bidirectional traversal | O(1) per step | O(1) per step | Not supported |
+| Memory per element | High (2 pointers) | Low (continuous) | Medium (1 pointer) |
+| Cache friendliness | Poor | Excellent | Poor |
+
+### **Space Complexity**
+
+- **Per node overhead**: 2 pointers (16 bytes on 64-bit systems) + 1 integer (4 bytes) = 20-24 bytes per element
+- **Sentinel overhead**: 1 extra node (20-24 bytes) regardless of list size
+- **Total**: O(n) where n is the number of elements
+- **Compared to array**: ~3-4x memory overhead due to pointer storage
+
+### **When to Use Doubly Linked List**
+
+**Use when**:
+- Frequent insertions/deletions at arbitrary positions
+- Bidirectional traversal required
+- Constant-time splice operations needed
+- List size varies significantly
+- Cache misses acceptable
+
+**Avoid when**:
+- Random access by index is primary operation
+- Memory is constrained
+- Cache performance is critical
+- Mostly sequential access with few modifications
