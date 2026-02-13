@@ -45,7 +45,9 @@ T Heap<T, comp>::pop() {
     T return_val = arr[1];
     std::swap(arr[1], arr[arr.size-1]);
     arr.pop_back();
-    sink(1);
+    if (arr.size > 1) {  // Only sink if there are elements left
+        sink(1);
+    }
     return return_val;
 }
 
@@ -54,34 +56,37 @@ void Heap<T, comp>::sink(const int& index) {
     assert(index > 0 && index < arr.size);
 
     int curri = index;
-    int lefti = curri * 2;
-    int righti = curri * 2 + 1;
-    bool exists_left = lefti < arr.size;
-    bool exists_right = righti < arr.size;
-
-    while (exists_left && exists_right) {
-        bool l_smallest = comp(arr[lefti], arr[righti]);
-        if (l_smallest && comp(arr[lefti], arr[curri])) {
-            std::swap(arr[curri], arr[lefti]);
-            curri = lefti;
+    
+    while (true) {
+        int lefti = curri * 2;
+        int righti = curri * 2 + 1;
+        bool exists_left = lefti < arr.size;
+        bool exists_right = righti < arr.size;
+        
+        if (!exists_left && !exists_right) {
+            // No children, we're done
+            break;
         }
-        else if (!l_smallest && comp(arr[righti], arr[curri])) {
-            std::swap(arr[curri], arr[righti]);
-            curri = righti;
+        
+        int smallest = curri;
+        
+        // Find the smallest among current, left child, and right child
+        if (exists_left && comp(arr[lefti], arr[smallest])) {
+            smallest = lefti;
         }
-        lefti = curri * 2;
-        righti = curri * 2 + 1;
-        exists_left = lefti < arr.size;
-        exists_right = righti < arr.size;
+        if (exists_right && comp(arr[righti], arr[smallest])) {
+            smallest = righti;
+        }
+        
+        // If current is already smallest, heap property is satisfied
+        if (smallest == curri) {
+            break;
+        }
+        
+        // Swap with the smallest child and continue
+        std::swap(arr[curri], arr[smallest]);
+        curri = smallest;
     }
-
-    if (exists_left) {
-        if (comp(arr[lefti], arr[curri])) std::swap(arr[curri], arr[lefti]);
-    }
-    else if (exists_right) {
-        if (comp(arr[righti], arr[curri])) std::swap(arr[curri], arr[righti]);
-    }
-    else return;
 }
 
 template<typename T, bool (*comp)(const T&, const T&)>
@@ -116,4 +121,3 @@ template bool min<float>(const float&, const float&);
 template struct Heap<double, min<double> >;
 template struct Heap<float, min<float> >;
 template struct Heap<int, min<int> >;
-
