@@ -24,34 +24,16 @@ struct AVLTree {
         root = new Node(key, value);
     }
 
-    Node* find(int key) {
-        return find(root, key);
-    }
-
-    Node* lower_bound(int key) {
-        return lower(root, key);
-    }
-
-    Node* upper_bound(int key) {
-        return upper(root, key);
-    }
-
     Node* insert(int key, int value) {
         Node* new_node = NULL;
         root = Insert(root, key, value, new_node);
-        if (root) {
-            root->parent = NULL;
-        }
-    return new_node;
+
+            if (root) {
+                root->parent = NULL;
+            }
+        
+        return new_node;
 }
-
-    Node* front() {
-        return Front();
-    }
-
-    Node* back() {
-        return Back();
-    }
 
     Node* Insert(Node* node, int key, int value, Node*& new_node) {
         if (node == NULL) {
@@ -222,6 +204,10 @@ struct AVLTree {
 
      }
 
+    Node* find(int key) {
+        return find(root, key);
+    }
+
      Node* find(Node* node, int key) {
         if (node == NULL) {
             return NULL;
@@ -240,6 +226,10 @@ struct AVLTree {
         }
 
      }
+
+     Node* lower_bound(int key) {
+        return lower(root, key);
+    }
 
      Node* lower(Node* node, int key) {
         if (node == NULL) {
@@ -262,6 +252,10 @@ struct AVLTree {
             return node;
         }
      }
+
+     Node* upper_bound(int key) {
+        return upper(root, key);
+    }
 
      Node* upper(Node* node, int key) {
         if (node == NULL) {
@@ -287,98 +281,98 @@ struct AVLTree {
 
     Node* erase(Node* node) {
 
-    if (node == NULL) {
-        return NULL;
-    }
+        if (node == NULL) {
+            return NULL;
+        }
 
-    Node* original_parent = node->parent;
-    
-    if (node->left == NULL && node->right == NULL) {
-        if (node->parent == NULL) {
-            root = NULL;
-        }
-        else {
-            if (node->parent->left == node) {
-                node->parent->left = NULL;
+        Node* original_parent = node->parent;
+        
+        if (node->left == NULL && node->right == NULL) {
+            if (node->parent == NULL) {
+                root = NULL;
             }
             else {
-                node->parent->right = NULL;
+                if (node->parent->left == node) {
+                    node->parent->left = NULL;
+                }
+                else {
+                    node->parent->right = NULL;
+                }
             }
-        }
-        delete node;
-     
-    }
-    
-    else if (node->left && node->right == NULL) {
-        node->left->parent = node->parent; 
+            delete node;
         
-        if (node->parent == NULL) {
-            root = node->left;
         }
-        else {
-            if (node->parent->left == node) {
-                node->parent->left = node->left;
+        
+        else if (node->left && node->right == NULL) {
+            node->left->parent = node->parent; 
+            
+            if (node->parent == NULL) {
+                root = node->left;
             }
             else {
-                node->parent->right = node->left;
+                if (node->parent->left == node) {
+                    node->parent->left = node->left;
+                }
+                else {
+                    node->parent->right = node->left;
+                }
             }
-        }
-        delete node;
-  
-    }
+            delete node;
     
-    else if (node->left == NULL && node->right) {
-        node->right->parent = node->parent;
-        
-        if (node->parent == NULL) {
-            root = node->right;
         }
-        else {
-            if (node->parent->left == node) {
-                node->parent->left = node->right;
+        
+        else if (node->left == NULL && node->right) {
+            node->right->parent = node->parent;
+            
+            if (node->parent == NULL) {
+                root = node->right;
             }
             else {
-                node->parent->right = node->right;
+                if (node->parent->left == node) {
+                    node->parent->left = node->right;
+                }
+                else {
+                    node->parent->right = node->right;
+                }
             }
-        }
-        delete node;
-      
-    }
-  
-    else {
+            delete node;
         
-        Node *succ = successor(node);
-        node->key = succ->key;
-        node->value = succ->value;
-        erase(succ);
-        return NULL;
-    };
+        }
+    
+        else {
+            
+            Node *succ = successor(node);
+            node->key = succ->key;
+            node->value = succ->value;
+            erase(succ);
+            return NULL;
+        };
 
-    Node* current = original_parent;
-    while (current != NULL) {
-        update_height(current);
-        update_size(current);
-    
-    Node* parent = current->parent;  
-    Node* balanced = balance(current);  
-    
-    
-    if (parent == NULL) {
-        root = balanced;
-        balanced->parent = NULL;
-    }
-    else if (parent->left == current) {
-        parent->left = balanced; 
-    }
-    else {
-        parent->right = balanced;
-    }
-    balanced->parent = parent;
-    
-    current = parent; 
-    
-}
-return NULL;
+        Node* current = original_parent;
+
+        while (current != NULL) {
+            update_height(current);
+            update_size(current);
+        Node* parent = current->parent;  
+        Node* balanced = balance(current);  
+        
+        if (parent == NULL) {
+            root = balanced;
+            balanced->parent = NULL;
+        } else if (parent->left == current) {
+            parent->left = balanced; 
+        }
+        
+        else {
+            parent->right = balanced;
+        }
+
+        balanced->parent = parent;
+        current = parent; 
+        
+        }
+
+        return NULL;
 
 
     };
@@ -413,7 +407,7 @@ return NULL;
 
     };
 
-    Node* Front() {
+    Node* front() {
         return Front_helper(root);
     };
 
@@ -429,7 +423,7 @@ return NULL;
         return Front_helper(node->left);
     };
 
-    Node* Back() {
+    Node* back() {
         return Back_helper(root);
     };
 
@@ -492,20 +486,26 @@ return NULL;
             return 0;
         }
         
-    
-        int rank = (node->left) ? node->left->size : 0;
+        int rank;
+        if (node->left) {
+            rank = node->left->size;
+        }
+        else {
+            rank = 0;
+        }
         
         Node* current = node;
         Node* parent = node->parent;
         
         while (parent != NULL) {
+
             if (parent->right == current) {
                 rank += 1;  
                 if (parent->left) {
                     rank += parent->left->size;
                 }
             }
-            
+
             current = parent;
             parent = parent->parent;
         }
@@ -514,24 +514,34 @@ return NULL;
     }
 
     Node* kth(int k) {
-    return kth_element_helper(root, k);
-}
+        return kth_helper(root, k);
+    }
 
-    Node* kth_element_helper(Node* node, int k) {
+    Node* kth_helper(Node* node, int element) {
         if (node == NULL) {
             return NULL;
         }
+
+        int left_size;
         
-        int left_size = (node->left) ? node->left->size : 0;
-        
-        if (k < left_size) {
-            return kth_element_helper(node->left, k);
-        }
-        else if (k == left_size) {
-            return node;
+        if (node->left) {
+            left_size = node->left->size;
         }
         else {
-            return kth_element_helper(node->right, k - left_size - 1);
+            left_size = 0;
+        }
+        
+        
+        if (element < left_size) {
+            return kth_helper(node->left, element);
+        }
+        else if (element == left_size) {
+            return node;
+        }
+
+
+        else {
+            return kth_helper(node->right, element - left_size - 1);
         }
     }
 
