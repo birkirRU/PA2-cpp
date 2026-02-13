@@ -1,7 +1,7 @@
 MAIN = main
 TEST = test
 FILES = main.cpp avl_tree.cpp
-TEST_FILES = test_avl_tree.cpp avl_tree.cpp
+TEST_FILES = test_avl_tree.cpp avl_tree.cpp ../utils/file_comparer.cpp
 
 CXXFLAGS = -std=c++98 -Wall -Wextra -O0 -g -fno-omit-frame-pointer
 VALGRIND = valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes
