@@ -1,7 +1,7 @@
 MAIN = main
 TEST = test
 FILES = main.cpp doubly_linked_list.cpp
-TEST_FILES = test_doubly_linked_list.cpp doubly_linked_list.cpp
+TEST_FILES = main.cpp doubly_linked_list.cpp doubly_link_list.h
 
 CXXFLAGS = -std=c++98 -Wall -Wextra -O0 -g -fno-omit-frame-pointer
 VALGRIND = valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes
