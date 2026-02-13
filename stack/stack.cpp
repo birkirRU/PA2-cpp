@@ -39,6 +39,6 @@ Stack<T>& Stack<T>::operator=(const Stack<T>& rhs) {
     return *this;
 }
 
-template class Stack<double>;
-template class Stack<float>;
-template class Stack<int>;
+template struct Stack<double>;
+template struct Stack<float>;
+template struct Stack<int>;
