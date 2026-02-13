@@ -638,3 +638,331 @@ pop()     →  [10]           top: 10
 - Top element is always at index `arr.size - 1`
 - Size is always equal to `arr.size`
 - Only top element is accessible (no random access)
+
+
+
+
+# AVL Tree Implementation
+
+## **AVL Tree (Self-Balancing Binary Search Tree)**
+
+### **Overview**
+An AVL Tree is a self-balancing binary search tree where the heights of the two child subtrees of any node differ by at most one. This ensures O(log n) time complexity for all major operations by maintaining tree balance through rotations.
+
+**Implementation Notes**:
+- **Self-balancing mechanism**: Automatic rebalancing after insert/erase via rotations
+- **Balance factor**: Maintained within [-1, 1] for every node (height_left - height_right)
+- **Rotation types**: Single rotations (left, right) and double rotations (left-right, right-left)
+- **Augmented nodes**: Each node stores height and subtree size for efficient operations
+- **Parent pointers**: Nodes maintain parent references for efficient traversal
+- **Key-value pairs**: Stores integer keys with associated integer values
+
+### **Time Complexities & Edge Cases**
+
+| Operation | Time Complexity | Exceptional Cases / Behavior |
+|-----------|----------------|------------------------------|
+| **Constructor** | O(1) | Initializes empty tree with NULL root |
+| **Constructor(key, value)** | O(1) | Creates tree with single root node |
+| **Destructor** | O(n) | Recursively deletes all nodes via delete_tree |
+| **Assignment Operator** | O(n) | Deep copy via copy_of_tree; Handles self-assignment |
+| **insert(key, value)** | O(log n) | Returns pointer to inserted/existing node; Duplicate keys update existing node; Triggers rebalancing |
+| **erase(node)** | O(log n) | Asserts node not NULL; Removes node and rebalances tree; Returns NULL |
+| **find(key)** | O(log n) | Returns pointer to node with key, or NULL if not found |
+| **lower_bound(key)** | O(log n) | Returns node with smallest key ≥ given key, or NULL if none exists |
+| **upper_bound(key)** | O(log n) | Returns node with smallest key > given key, or NULL if none exists |
+| **front()** | O(log n) | Returns leftmost (minimum) node, or NULL if tree empty |
+| **back()** | O(log n) | Returns rightmost (maximum) node, or NULL if tree empty |
+| **successor(node)** | O(log n) | Returns next node in sorted order, or NULL if node is maximum |
+| **predecessor(node)** | O(log n) | Returns previous node in sorted order, or NULL if node is minimum |
+| **rank(node)** | O(log n) | Returns 0-based index of node in sorted order; Returns 0 if node is NULL |
+| **kth(k)** | O(log n) | Returns node at 0-based index k in sorted order, or NULL if k out of bounds |
+| **size()** | O(1) | Returns total number of nodes in tree; Returns 0 if tree empty |
+
+### **Memory Management**
+
+**Allocation Strategy:**
+- Each node allocated dynamically with `new` operator
+- Nodes store: key, value, height, size, left, right, parent pointers
+- Memory overhead: 7 integers per node (28 bytes on 32-bit, 56 bytes with pointers on 64-bit)
+
+**Balancing Strategy:**
+- After each insert/erase, updates height and size bottom-up to root
+- Checks balance factor at each node along path
+- Performs rotations when |balance_factor| > 1
+- Four rotation cases:
+  - **Left-Left (LL)**: Single right rotation
+  - **Right-Right (RR)**: Single left rotation
+  - **Left-Right (LR)**: Left rotation on left child, then right rotation
+  - **Right-Left (RL)**: Right rotation on right child, then left rotation
+
+**Copy Semantics:**
+- **Copy Constructor**: Not explicitly implemented; uses default (shallow copy - potential issue)
+- **Assignment Operator**: Deep copy via copy_of_tree; Deletes existing tree before copying
+
+**Key Features:**
+- Guaranteed O(log n) height for all operations
+- Order statistics: rank() and kth() for finding positions and elements
+- Range queries: lower_bound() and upper_bound() for interval searches
+- Bidirectional traversal: successor() and predecessor() for in-order iteration
+- Augmented data: size field enables O(log n) order statistics
+
+### **Node Structure**
+
+Each node contains:
+- **key**: Integer search key (unique identifier)
+- **value**: Associated integer value (can be updated)
+- **height**: Height of subtree rooted at this node (for balancing)
+- **size**: Number of nodes in subtree rooted at this node (for order statistics)
+- **left**: Pointer to left child (smaller keys)
+- **right**: Pointer to right child (larger keys)
+- **parent**: Pointer to parent node (NULL for root)
+
+## **Testing**
+
+### **Compilation and Execution**
+
+**To compile the main program:**
+```bash
+make
+# or
+make main
+```
+
+**To compile the test suite:**
+```bash
+make test
+```
+
+**To run the main program (interactive mode):**
+```bash
+make run
+# or
+./main
+```
+
+**To run the automated test suite:**
+```bash
+make run-test
+# or
+./test
+```
+
+**To run with memory leak detection:**
+```bash
+make valgrind-main    # Check main program
+make valgrind-test    # Check test suite
+```
+
+**To clean build artifacts:**
+```bash
+make clean
+```
+
+### **Test Suite Structure**
+
+The test suite consists of 10 test files with corresponding expected output files in the `tests/` directory:
+
+- **tests/test1.txt / tests/eout1.txt**: Basic insert and find operations
+- **tests/test2.txt / tests/eout2.txt**: Front, back, and successor traversal
+- **tests/test3.txt / tests/eout3.txt**: Rank and kth element operations
+- **tests/test4.txt / tests/eout4.txt**: Lower bound and upper bound searches
+- **tests/test5.txt / tests/eout5.txt**: Erase operations and size updates
+- **tests/test6.txt / tests/eout6.txt**: Set value and get operations
+- **tests/test7.txt / tests/eout7.txt**: Predecessor traversal operations
+- **tests/test8.txt / tests/eout8.txt**: Multiple tree instances and assignment
+- **tests/test9.txt / tests/eout9.txt**: Duplicate key insertion and complex operations
+- **tests/test10.txt / tests/eout10.txt**: Comprehensive stress test with mixed operations
+
+### **Test Input Format**
+
+Each test file follows this format:
+```
+<number_of_operations>
+<instance_number> <operation> [arguments...]
+```
+
+**Operations:**
+- `i` key value: insert(key, value) - Insert or update key-value pair; Sets cursor to inserted/updated node
+- `?` key: find(key) - Find node with given key; Sets cursor to found node or NULL
+- `l` key: lower_bound(key) - Find node with smallest key ≥ given key; Sets cursor
+- `u` key: upper_bound(key) - Find node with smallest key > given key; Sets cursor
+- `e`: erase(cursor) - Erase node at cursor; Sets cursor to NULL
+- `f`: front() - Get minimum (leftmost) node; Sets cursor
+- `b`: back() - Get maximum (rightmost) node; Sets cursor
+- `>`: successor(cursor) - Get next node in sorted order; Updates cursor
+- `<`: predecessor(cursor) - Get previous node in sorted order; Updates cursor
+- `r`: rank(cursor) - Get 0-based index of cursor node; Prints to output; Prints "-" if cursor is NULL
+- `k` k: kth(k) - Get node at 0-based index k; Sets cursor
+- `g`: Get value at cursor; Prints to output; Prints "-" if cursor is NULL
+- `s` value: Set value at cursor to value; Does nothing if cursor is NULL
+- `z`: size() - Get total number of nodes; Prints to output
+- `a` other_instance: Assignment from other_instance; Sets cursor to NULL
+
+### **Test Execution**
+
+The test runner automatically:
+1. Runs each test file (tests/test1.txt through tests/test10.txt)
+2. Compares actual output with expected output (tests/eout1.txt through tests/eout10.txt)
+3. Reports pass/fail status with color coding
+4. Provides a summary of test results
+
+**Expected Output:**
+```
+========================================
+  AVL Tree Test Suite
+========================================
+
+[PASS] Test 1
+[PASS] Test 2
+[PASS] Test 3
+[PASS] Test 4
+[PASS] Test 5
+[PASS] Test 6
+[PASS] Test 7
+[PASS] Test 8
+[PASS] Test 9
+[PASS] Test 10
+
+========================================
+  Test Summary
+========================================
+  Total:   10
+  Passed:  10
+  Failed:  0
+========================================
+
+All tests passed!
+```
+
+## **Implementation Files**
+
+- **avl_tree.h**: Header file with Node struct and AVLTree class declaration
+- **main.cpp**: Interactive program for manual testing with multiple tree instances
+- **test_avl_tree.cpp**: Automated test suite runner
+- **Makefile**: Build automation with multiple targets
+- **tests/test1.txt - tests/test10.txt**: Test input files
+- **tests/eout1.txt - tests/eout10.txt**: Expected output files
+
+## **Design Decisions**
+
+1. **Parent Pointers**: Each node maintains a parent pointer for efficient traversal operations (successor, predecessor) without requiring a stack or recursion.
+
+2. **Size Augmentation**: Each node stores its subtree size, enabling O(log n) order statistics (rank and kth) without additional overhead during updates.
+
+3. **Duplicate Key Handling**: Inserting a duplicate key updates the value of the existing node rather than creating a new node, maintaining uniqueness of keys.
+
+4. **Cursor-Based Interface**: The main.cpp uses a cursor system (array of node pointers) to track positions in multiple tree instances, enabling complex multi-instance operations.
+
+5. **Rebalancing After Erase**: After erasing a node, the algorithm walks up from the parent to the root, updating heights/sizes and rebalancing at each step.
+
+6. **NULL Handling**: Most operations gracefully handle NULL pointers, returning NULL or 0 as appropriate (e.g., rank(NULL) returns 0, find returns NULL if not found).
+
+7. **Two-Step Insert**: The insert function uses an internal Insert helper that takes a reference parameter (new_node) to return the inserted node pointer while still returning the updated subtree root.
+
+## **AVL Tree Operations**
+
+### **Balancing Invariant**
+
+The AVL tree maintains the following invariant:
+```
+For every node N:
+  |height(N.left) - height(N.right)| ≤ 1
+```
+
+This ensures the tree height is at most 1.44 * log₂(n), guaranteeing O(log n) operations.
+
+### **Rotation Examples**
+
+**Right Rotation (LL case):**
+```
+    y                x
+   / \              / \
+  x   C    →       A   y
+ / \                  / \
+A   B                B   C
+```
+
+**Left Rotation (RR case):**
+```
+  x                  y
+ / \                / \
+A   y      →       x   C
+   / \            / \
+  B   C          A   B
+```
+
+### **Order Statistics Examples**
+
+```
+Tree: [10, 20, 30, 40, 50, 60, 70]
+
+rank(node_30) → 2        (0-based index)
+kth(2) → node_30         (node at index 2)
+kth(0) → node_10         (minimum)
+kth(6) → node_70         (maximum)
+```
+
+### **Range Query Examples**
+
+```
+Tree: [10, 20, 30, 40, 50, 60, 70]
+
+lower_bound(25) → node_30    (smallest key ≥ 25)
+lower_bound(30) → node_30    (exact match)
+upper_bound(30) → node_40    (smallest key > 30)
+upper_bound(25) → node_30    (smallest key > 25)
+```
+
+### **Typical Use Cases**
+
+- Maintaining sorted data with frequent insertions/deletions
+- Order statistics queries (finding kth smallest/largest element)
+- Range queries (finding all elements in a range)
+- Database indexing with balanced search performance
+- Finding predecessor/successor in sorted order
+- Implementing sorted sets and maps with guaranteed O(log n) performance
+
+### **AVL Tree Invariants**
+
+- **BST Property**: For every node N: all keys in left subtree < N.key < all keys in right subtree
+- **Balance Property**: For every node N: |height(left) - height(right)| ≤ 1
+- **Height Property**: height(N) = 1 + max(height(left), height(right))
+- **Size Property**: size(N) = 1 + size(left) + size(right)
+- **Parent Property**: For every non-root node N: N.parent.left == N or N.parent.right == N
+- **Root Property**: root.parent == NULL
+
+## **Complexity Analysis**
+
+### **Height Guarantee**
+
+The AVL tree height h satisfies:
+```
+h ≤ 1.44 * log₂(n + 2) - 0.328
+```
+
+This means a tree with 1,000,000 nodes has height at most 29, ensuring fast operations.
+
+### **Operation Breakdown**
+
+**Insert(key, value):**
+- Search for insertion point: O(log n)
+- Create new node: O(1)
+- Update heights/sizes up to root: O(log n)
+- Perform at most 2 rotations: O(1)
+- Total: O(log n)
+
+**Erase(node):**
+- Find successor (if needed): O(log n)
+- Remove node: O(1)
+- Update heights/sizes up to root: O(log n)
+- Perform O(log n) rotations in worst case: O(log n)
+- Total: O(log n)
+
+**Rank(node):**
+- Walk from node to root: O(log n)
+- Accumulate left subtree sizes: O(log n)
+- Total: O(log n)
+
+**Kth(k):**
+- Recursively search using subtree sizes: O(log n)
+- Total: O(log n)
