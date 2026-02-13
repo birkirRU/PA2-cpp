@@ -1,7 +1,7 @@
 MAIN = main
 FILES = main.cpp avl_tree.cpp
 
-CXXFLAGS = -std=c++98 -Wall -Wextra -O0 -g -fno-omit-frame-pointer
+CXXFLAGS = -std=c++98 -Wall -Wextra -O0 -g3 -fno-omit-frame-pointer -D_GLIBXX_DEBUG
 VALGRIND = valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes
 
 all: $(MAIN)
@@ -18,13 +18,13 @@ valgrind-main: $(MAIN)
 test: $(MAIN)
 	@echo "Running tests..."
 	@i=1; \
-	while [ -f "Tests/test$$i.txt" ]; do \
-		./$(MAIN) < "Tests/test$$i.txt" > "/tmp/test$$i.got"; \
-		if diff -q "Tests/eout$$i.txt" "/tmp/test$$i.got" > /dev/null; then \
+	while [ -f "tests/test$$i.txt" ]; do \
+		./$(MAIN) < "tests/test$$i.txt" > "/tmp/test$$i.got"; \
+		if diff -q "tests/eout$$i.txt" "/tmp/test$$i.got" > /dev/null; then \
 			echo "test$$i PASS"; \
 		else \
 			echo "test$$i FAIL"; \
-			diff -u "Tests/eout$$i.txt" "/tmp/test$$i.got"; \
+			diff -u "tests/eout$$i.txt" "/tmp/test$$i.got"; \
 		fi; \
 		i=$$((i+1)); \
 	done

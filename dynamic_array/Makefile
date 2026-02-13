@@ -1,7 +1,7 @@
 MAIN = main
 FILES = main.cpp dynamic_array.cpp
 
-CXXFLAGS = -std=c++98 -Wall -Wextra -O0 -g -fno-omit-frame-pointer
+CXXFLAGS = -std=c++98 -Wall -Wextra -O0 -g3 -fno-omit-frame-pointer -D_GLIBXX_DEBUG
 VALGRIND = valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes
 
 all: $(MAIN)
@@ -17,14 +17,14 @@ valgrind-main: $(MAIN)
 
 test: $(MAIN)
 	@echo "Running tests..."
-	@for f in Tests/test*.in; do \
+	@for f in tests/test*.in; do \
 		n=$$(basename "$$f" .in); \
 		./$(MAIN) < "$$f" > /tmp/$$n.got; \
-		if diff -q "Tests/$$n.out" /tmp/$$n.got > /dev/null; then \
+		if diff -q "tests/$$n.out" /tmp/$$n.got > /dev/null; then \
 			echo "$$n PASS"; \
 		else \
 			echo "$$n FAIL"; \
-			diff -u "Tests/$$n.out" /tmp/$$n.got; \
+			diff -u "tests/$$n.out" /tmp/$$n.got; \
 		fi; \
 	done
 
