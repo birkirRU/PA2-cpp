@@ -185,6 +185,6 @@ void DArr<T>::print() {
     std::cout << '\n';
 }
 
-template class DArr<double>;
-template class DArr<float>;
-template class DArr<int>;
+template struct DArr<double>;
+template struct DArr<float>;
+template struct DArr<int>;

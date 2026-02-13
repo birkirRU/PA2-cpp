@@ -1,39 +1,36 @@
 MAIN = main
-TEST = test
 FILES = main.cpp avl_tree.cpp
-TEST_FILES = test_avl_tree.cpp avl_tree.cpp ../utils/file_comparer.cpp
 
 CXXFLAGS = -std=c++98 -Wall -Wextra -O0 -g -fno-omit-frame-pointer
 VALGRIND = valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes
 
-all: $(MAIN) $(TEST)
+all: $(MAIN)
 
 $(MAIN): $(FILES)
 	g++ $(CXXFLAGS) $(FILES) -o $(MAIN)
 
-$(TEST): $(TEST_FILES)
-	g++ $(CXXFLAGS) $(TEST_FILES) -o $(TEST)
-
-release: clean
-	g++ -std=c++98 -O2 -o $(MAIN) $(FILES)
-
-debug: $(MAIN)
-
-test: $(TEST)
-
 run: $(MAIN)
 	./$(MAIN)
-
-run-test: $(TEST)
-	./$(TEST)
 
 valgrind-main: $(MAIN)
 	$(VALGRIND) ./$(MAIN)
 
-valgrind-test: $(TEST)
-	$(VALGRIND) ./$(TEST)
+test: $(MAIN)
+	@echo "Running tests..."
+	@i=1; \
+	while [ -f "Tests/test$$i.txt" ]; do \
+		./$(MAIN) < "Tests/test$$i.txt" > "/tmp/test$$i.got"; \
+		if diff -q "Tests/eout$$i.txt" "/tmp/test$$i.got" > /dev/null; then \
+			echo "test$$i PASS"; \
+		else \
+			echo "test$$i FAIL"; \
+			diff -u "Tests/eout$$i.txt" "/tmp/test$$i.got"; \
+		fi; \
+		i=$$((i+1)); \
+	done
 
 clean:
-	rm -f $(MAIN) $(TEST)
+	rm -f $(MAIN)
+	rm -rf *.dSYM
 
-.PHONY: all release debug test run run-test valgrind-main valgrind-test clean
+.PHONY: all run test valgrind-main clean

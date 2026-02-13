@@ -12,10 +12,24 @@ $(MAIN): $(FILES)
 run: $(MAIN)
 	./$(MAIN)
 
-valgrind: $(MAIN)
+valgrind-main: $(MAIN)
 	$(VALGRIND) ./$(MAIN)
+
+test: $(MAIN)
+	@echo "Running tests..."
+	@for f in Tests/test*.in; do \
+		n=$$(basename "$$f" .in); \
+		./$(MAIN) < "$$f" > /tmp/$$n.got; \
+		if diff -q "Tests/$$n.out" /tmp/$$n.got > /dev/null; then \
+			echo "$$n PASS"; \
+		else \
+			echo "$$n FAIL"; \
+			diff -u "Tests/$$n.out" /tmp/$$n.got; \
+		fi; \
+	done
 
 clean:
 	rm -f $(MAIN)
+	rm -rf *.dSYM
 
-.PHONY: all run valgrind clean
+.PHONY: all run test valgrind-main clean
