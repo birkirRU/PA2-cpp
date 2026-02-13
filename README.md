@@ -81,11 +81,13 @@ make run
 ```
 
 **To run the automated test suite:**
+
 ```bash
 make run-test
 # or
 ./test
 ```
+Note: Test suite needs 'main' to compiled also. To be sure run `make all`.
 
 **To run with memory leak detection:**
 ```bash
