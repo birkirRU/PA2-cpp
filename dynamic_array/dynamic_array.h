@@ -12,7 +12,7 @@ struct DArr {
     T* arr;
     
     // Constructors 
-    DArr(const int init_cap = 8);           // Declaration
+    DArr(const int init_cap = 8);      // Declaration
     DArr(const DArr& other);          // Declaration
     ~DArr();                          // Declaration
     

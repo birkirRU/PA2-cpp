@@ -13,18 +13,18 @@ struct Heap {
     ~Heap();
 
     void push(const T& data);
-    void pop();
+    T pop();
     T& peek();
-    T& get_size();
+    int get_size();
 
     void swim(const int& index);
-    void sink();
+    void sink(const int& index);
 
-    Heap<T>& operator=(const Heap& rhs);
+    Heap& operator=(const Heap& rhs);
 };
 
 template<typename T>
-bool smaller(const T& rhs, const T& lhs);
+bool min(const T& rhs, const T& lhs);
 
 
 #endif
