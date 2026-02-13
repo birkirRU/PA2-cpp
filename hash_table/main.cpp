@@ -35,7 +35,7 @@ int main() {
         else if (op == 'e') {
             int key;
             cin >> key;
-            table[instance].remove(key);
+            table[instance].erase(key);
         }
         else if (op == 'g') {
             int key;
@@ -52,7 +52,7 @@ int main() {
         else if (op == 's') {
             int key, value;
             cin >> key >> value;
-            table[instance].remove(key);
+            table[instance].erase(key);
             table[instance].insert(key, value);
         }
 

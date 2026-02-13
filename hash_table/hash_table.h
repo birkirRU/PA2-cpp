@@ -68,7 +68,8 @@ struct HashTable {
 
 
     int hash(int key) {
-       return std::abs(key) % capacity;
+        int temp = key * 539;
+        return std::abs(temp) % capacity;
     }
 
     bool do_i_resize() {
@@ -170,7 +171,7 @@ struct HashTable {
 
      }
 
-    void remove(int key) {
+    void erase(int key) {
         int index = hash(key);
         Node* node = table[index];
         Node* before = NULL;
